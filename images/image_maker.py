@@ -15,25 +15,26 @@ def main():
 	im = Image.new("RGB", (sx,sy), "black")
 	pixels = im.load()
 
-
+	mulx = cr/sx
+	muly = cr/sy
 
 	for i in range(sx):
 		for j in range(sy):
 			x = i-sx/2
 			y = -(j-sy/2)
 
-			r = x
-			g = y
-			b = math.fabs(y)+math.fabs(x)
+			r = x*mulx
+			g = y*muly
+			b = math.fabs(y)*mulx+math.fabs(x)*mulx
 			r,g,b =colourPublish(r, g, b)
 
-			for i1 in range(int(-sx/2),int(sx/2)+10, 10):
-				r,g,b = lineGradient(x,y, 1, 1, i1, 0, 2, cr, cr/2, 0, r, g, b, strn=cr/2)
-				r,g,b = lineGradient(x,y, 1, -1, i1, 0, 2, 0, cr/2, cr, r, g, b, strn=cr/2)
+			#for i1 in range(int(-sx/2),int(sx/2)+10, 10):
+			#	r,g,b = lineGradient(x,y, 1, 1, i1, 0, 2, cr, cr/2, 0, r, g, b, strn=cr/2)
+			#	r,g,b = lineGradient(x,y, 1, -1, i1, 0, 2, 0, cr/2, cr, r, g, b, strn=cr/2)
 
 			r,g,b = colourPublish(r, g, b)
 
-			printArea(x,y, 5, 5, r, g, b)
+			#printArea(x,y, 5, 5, r, g, b)
 			pixels[i,j] = (r, g, b)
 			
 	#im.show()
