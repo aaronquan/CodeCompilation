@@ -2,6 +2,9 @@ from PIL import Image
 import math
 import sys
 
+C_RANGE = 255
+MOD_RANGE = 256
+WHITE = (255,255,255)
 
 def convergeToByOne(var, x):
 	if var > x:
@@ -9,6 +12,13 @@ def convergeToByOne(var, x):
 	elif var < x:
 		var += 1
 	return var
+
+def sign(var):
+	if var > 0:
+		return 1
+	if var < 0:
+		return -1
+	return 0
 
 class Point():
 	def __init__(this, x, y):
@@ -55,7 +65,29 @@ class Line():
 				if p.equals(this.p2): break
 				c = convergeToByOne(c,-dy)
 		else:
-			pass
+			print (dx > dy)
+			if dx > dy:
+				grad, cy = dy/dx, 0
+				i = sign(grad)
+				p = Point(this.p1.x, this.p1.y)
+				points.append(p)
+				while True:
+					p = Point(this.p1.x, this.p1.y)
+					print(p.toString())
+					cy += grad
+					if cy > 0.5: 
+						p.addPoint(Point(-i,1))
+						cy -= 1
+					elif cy < -0.5: 
+						p.addPoint(Point(-i,-1))
+						cy += 1
+					else: p.addPoint(Point(-i,0))
+					points.append(p)
+					if p.equals(this.p2): break
+			if dx < dy:
+				pass
+			if dx == dy:
+				pass
 		return points
 
 class Canvas():
@@ -68,16 +100,16 @@ class Canvas():
 		for x in range(this.width):
 			for y in range(this.height):
 				this.pixels[x,y] = colour
-	def drawPoint(this, p, colour):
+	def drawPoint(this, p, colour=WHITE):
 		this.pixels[p.x,p.y] = colour
 	def saveToFile(this, file):
 		this.image.save(file)
 
 class Colour():
-	def __init__(this, r,g,b,a=255):
-		this.r = r%256
-		this.g = g%256
-		this.b = b%256
+	def __init__(this, r,g,b,a=C_RANGE):
+		this.r = r%MOD_RANGE
+		this.g = g%MOD_RANGE
+		this.b = b%MOD_RANGE
 		this.a = a
 	def tuple(this):
 		return (this.r,this.g,this.b,this.a)
