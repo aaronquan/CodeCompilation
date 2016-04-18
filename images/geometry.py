@@ -55,24 +55,29 @@ class Line():
 				if p.equals(this.p2): break
 				c = convergeToByOne(c,-dy)
 		else:
-			ys = dy/dx
+			pass
 		return points
 
 class Canvas():
 	def __init__(this, width, height):
 		this.width = width
 		this.height = height
-		this.image = Image.new("RGB", (width, height))
+		this.image = Image.new("RGBA", (width, height))
 		this.pixels = this.image.load()
+	def background(this, colour):
+		for x in range(this.width):
+			for y in range(this.height):
+				this.pixels[x,y] = colour
 	def drawPoint(this, p, colour):
 		this.pixels[p.x,p.y] = colour
 	def saveToFile(this, file):
 		this.image.save(file)
 
 class Colour():
-	def __init__(this, r,g,b):
+	def __init__(this, r,g,b,a=255):
 		this.r = r%256
-		this.g = r%256
-		this.b = r%256
+		this.g = g%256
+		this.b = b%256
+		this.a = a
 	def tuple(this):
-		return (this.r,this.g,this.b)
+		return (this.r,this.g,this.b,this.a)
