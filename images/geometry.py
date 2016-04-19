@@ -20,6 +20,9 @@ def sign(var):
 		return -1
 	return 0
 
+def fabsCheck(p,q):
+	return(math.fabs(p) > math.fabs(q))
+
 class Point():
 	def __init__(this, x, y):
 		this.x = x
@@ -38,6 +41,7 @@ class Line():
 	def __init__(this, p1, p2):
 		this.p1 = p1
 		this.p2 = p2
+		this.points = this.lineToPoints()
 	def diffX(this):
 		return (this.p1.x - this.p2.x)
 	def diffY(this):
@@ -45,50 +49,57 @@ class Line():
 	def lineToPoints(this):
 		dx = this.diffX()
 		dy = this.diffY()
-		points = []
+		i,j = sign(dx),sign(dy)
+		p = Point(this.p1.x, this.p1.y)
+		points = [p]
 		if dx == 0 and dy == 0:
 			pass
 		elif dy == 0:
-			c = 0			
 			while True:
-				p = Point(this.p1.x, this.p1.y)
-				p.addPoint(Point(c,0))
+				p = p.addToPoint(Point(-sign(dx),0))
 				points.append(p)
 				if p.equals(this.p2): break
-				c = convergeToByOne(c,-dx)
 		elif dx == 0:
-			c = 0
 			while True:
-				p = Point(this.p1.x, this.p1.y)
-				p.addPoint(Point(0,c))
+				p = p.addToPoint(Point(0,-sign(dy)))
 				points.append(p)
 				if p.equals(this.p2): break
-				c = convergeToByOne(c,-dy)
 		else:
-			print (dx > dy)
-			if dx > dy:
+			if fabsCheck(dx,dy):
 				grad, cy = dy/dx, 0
-				i = sign(grad)
-				p = Point(this.p1.x, this.p1.y)
-				points.append(p)
 				while True:
-					p = Point(this.p1.x, this.p1.y)
 					print(p.toString())
 					cy += grad
 					if cy > 0.5: 
-						p.addPoint(Point(-i,1))
+						p = p.addToPoint(Point(-i,sign(cy)))
 						cy -= 1
 					elif cy < -0.5: 
-						p.addPoint(Point(-i,-1))
+						p = p.addToPoint(Point(-i,-sign(cy)))
 						cy += 1
-					else: p.addPoint(Point(-i,0))
+					else: 
+						p = p.addToPoint(Point(-i,0))
 					points.append(p)
 					if p.equals(this.p2): break
-			if dx < dy:
-				pass
-			if dx == dy:
+			elif fabsCheck(dy,dx):
+				grad, cx = dx/dy, 0
+				while True:
+					print(p.toString())
+					cx += grad
+					if cx > 0.5: 
+						p = p.addToPoint(Point(-sign(cx),-j))
+						cx -= 1
+					elif cx < -0.5: 
+						p = p.addToPoint(Point(sign(cx),-j))
+						cx += 1
+					else: 
+						p = p.addToPoint(Point(0,-j))
+					points.append(p)
+					if p.equals(this.p2): break
+			else: #dx == dy
 				pass
 		return points
+
+
 
 class Canvas():
 	def __init__(this, width, height):
