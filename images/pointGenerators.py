@@ -1,5 +1,4 @@
 import itertools
-from geometry import *
 
 def numbers(i):
 	n = i
@@ -7,9 +6,7 @@ def numbers(i):
 		yield n
 		n += 1
 
-def adjPointGen(i,j):
-	a,b = (0,0)
+def pointGeneratorAdd(start,add):
 	while True:
-		yield Point(a,b)
-		a += i
-		b += j
+		yield start
+		start = start.addToPoint(add)

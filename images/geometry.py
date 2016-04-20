@@ -2,125 +2,142 @@ from PIL import Image
 import math
 import sys
 
+from geoMath import *
+from pointGenerators import *
+
 C_RANGE = 255
 MOD_RANGE = 256
 WHITE = (255,255,255)
-
-def convergeToByOne(var, x):
-	if var > x:
-		var -= 1
-	elif var < x:
-		var += 1
-	return var
-
-def sign(var):
-	if var > 0:
-		return 1
-	if var < 0:
-		return -1
-	return 0
-
-def fabsCheck(p,q):
-	return(math.fabs(p) > math.fabs(q))
+BLACK = (0,0,0)
 
 class Point():
-	def __init__(this, x, y):
-		this.x = x
-		this.y = y
-	def toString(this):
-		return "("+str(this.x)+","+str(this.y)+")"
-	def addPoint(this, p):
-		this.x = this.x+p.x
-		this.y = this.y+p.y
-	def addToPoint(this, p):
-		return Point(this.x+p.x, this.y+p.y)
-	def equals(this, p):
-		return (this.x == p.x and this.y == p.y)
+	def __init__(self, x, y):
+		self.x = x
+		self.y = y
+	def toString(self):
+		return "("+str(self.x)+","+str(self.y)+")"
+	def addPoint(self, p):
+		self.x = self.x+p.x
+		self.y = self.y+p.y
+	def addToPoint(self, p):
+		return Point(self.x+p.x, self.y+p.y)
+	def equals(self, p):
+		return (self.x == p.x and self.y == p.y)
 
 class Line():
-	def __init__(this, p1, p2):
-		this.p1 = p1
-		this.p2 = p2
-		this.points = this.lineToPoints()
-	def diffX(this):
-		return (this.p1.x - this.p2.x)
-	def diffY(this):
-		return (this.p1.y - this.p2.y)
-	def lineToPoints(this):
-		dx = this.diffX()
-		dy = this.diffY()
+	def __init__(self, p1, p2):
+		self.p1 = p1
+		self.p2 = p2
+		self.points = self.lineToPoints()
+	def diffX(self):
+		return (self.p2.x - self.p1.x)
+	def diffY(self):
+		return (self.p2.y - self.p1.y)
+	def lineToPoints(self):
+		dx = self.diffX()
+		dy = self.diffY()
 		i,j = sign(dx),sign(dy)
-		p = Point(this.p1.x, this.p1.y)
+		p = Point(self.p1.x, self.p1.y)
 		points = [p]
 		if dx == 0 and dy == 0:
-			pass
+			return [self.p1]
 		elif dy == 0:
-			while True:
-				p = p.addToPoint(Point(-sign(dx),0))
-				points.append(p)
-				if p.equals(this.p2): break
+			return self.lineToPointsHorizontal()
 		elif dx == 0:
-			while True:
-				p = p.addToPoint(Point(0,-sign(dy)))
-				points.append(p)
-				if p.equals(this.p2): break
+			return self.lineToPointsVertical()
 		else:
-			if fabsCheck(dx,dy):
-				grad, cy = dy/dx, 0
-				while True:
-					print(p.toString())
-					cy += grad
-					if cy > 0.5: 
-						p = p.addToPoint(Point(-i,sign(cy)))
-						cy -= 1
-					elif cy < -0.5: 
-						p = p.addToPoint(Point(-i,-sign(cy)))
-						cy += 1
-					else: 
-						p = p.addToPoint(Point(-i,0))
-					points.append(p)
-					if p.equals(this.p2): break
-			elif fabsCheck(dy,dx):
-				grad, cx = dx/dy, 0
-				while True:
-					print(p.toString())
-					cx += grad
-					if cx > 0.5: 
-						p = p.addToPoint(Point(-sign(cx),-j))
-						cx -= 1
-					elif cx < -0.5: 
-						p = p.addToPoint(Point(sign(cx),-j))
-						cx += 1
-					else: 
-						p = p.addToPoint(Point(0,-j))
-					points.append(p)
-					if p.equals(this.p2): break
-			else: #dx == dy
-				pass
+			if math.fabs(dx) == math.fabs(dy):
+				#return self.lineToPointsDiagonal()
+				return self.lineToPointsPerfectDiagonal()
+			else:
+				return self.lineToPointsDiagonal()
+		return points
+	def lineToPointsHorizontal(self):
+		points = []
+		gen = pointGeneratorAdd(self.p1, Point(sign(self.diffX()), 0))
+		while True:
+			p = next(gen)
+			points.append(p)
+			if p.x == self.p2.x: break
+		return points
+	def lineToPointsVertical(self):
+		points = []
+		gen = pointGeneratorAdd(self.p1, Point(0, sign(self.diffY())))
+		while True:
+			p = next(gen)
+			points.append(p)
+			if p.y == self.p2.y: break
+		return points
+	def lineToPointsPerfectDiagonal(self):
+		points = []
+		gen = pointGeneratorAdd(self.p1, Point(sign(self.diffX()), sign(self.diffY())))
+		while True:
+			p = next(gen)
+			points.append(p)
+			if p.y == self.p2.y and p.x == self.p2.x: break
+		return points
+	def lineToPointsDiagonal(self):
+		points = []
+		gen = pointGeneratorFloat(self.p1, self.diffX(), self.diffY())
+		while True:
+			p = next(gen)
+			points.append(p)
+			if p.equals(self.p2): break
 		return points
 
-
-
 class Canvas():
-	def __init__(this, width, height):
-		this.width = width
-		this.height = height
-		this.image = Image.new("RGBA", (width, height))
-		this.pixels = this.image.load()
-	def background(this, colour):
-		for x in range(this.width):
-			for y in range(this.height):
-				this.pixels[x,y] = colour
-	def drawPoint(this, p, colour=WHITE):
-		this.pixels[p.x,p.y] = colour
-	def saveToFile(this, file):
-		this.image.save(file)
+	def __init__(self, width, height):
+		self.width = width
+		self.height = height
+		self.image = Image.new("RGBA", (width, height))
+		self.pixels = self.image.load()
+	def background(self, colour):
+		for x in range(self.width):
+			for y in range(self.height):
+				self.pixels[x,y] = colour
+	def drawPoint(self, p, colour=WHITE):
+		self.pixels[p.x,p.y] = colour
+	def saveToFile(self, file):
+		self.image.save(file)
 
 class Colour():
-	def __init__(this, r,g,b,a=C_RANGE):
-		this.r = r%MOD_RANGE
-		this.g = g%MOD_RANGE
-		this.b = b%MOD_RANGE
-		this.a = a
-	def tuple(this):
-		return (this.r,this.g,this.b,this.a)
+	def __init__(self, r,g,b,a=C_RANGE):
+		self.r = r%MOD_RANGE
+		self.g = g%MOD_RANGE
+		self.b = b%MOD_RANGE
+		self.a = a
+	def tuple(self):
+		return (self.r,self.g,self.b,self.a)
+
+def pointGeneratorFloat(start, xf, yf):
+	c = 0
+	if fabsCheck(xf,yf):
+		grad = math.fabs(yf/xf)
+		while True:
+			yield start
+			c += grad*sign(yf)
+			if c > 0.5:
+				start = start.addToPoint(Point(sign(xf),1))
+				c -= 1
+			elif c < -0.5:
+				start = start.addToPoint(Point(sign(xf),-1))
+				c += 1
+			else:
+				start = start.addToPoint(Point(sign(xf),0))
+	elif fabsCheck(yf,xf):
+		grad = math.fabs(xf/yf)
+		while True:
+			yield start
+			c += grad*sign(xf)
+			if c > 0.5:
+				start = start.addToPoint(Point(1,sign(yf)))
+				c -= 1
+			elif c < -0.5:
+				start = start.addToPoint(Point(-1,sign(yf)))
+				c += 1
+			else:
+				start = start.addToPoint(Point(0,sign(yf)))
+	else:
+		gen = pointGeneratorAdd(start, Point(sign(xf), sign(yf)))
+		while True:
+			yield next(gen)
