@@ -10,6 +10,8 @@ MOD_RANGE = 256
 WHITE = (255,255,255)
 BLACK = (0,0,0)
 
+
+#a point is a position/coordinate on the canvas
 class Point():
 	def __init__(self, x, y):
 		self.x = x
@@ -24,6 +26,7 @@ class Point():
 	def equals(self, p):
 		return (self.x == p.x and self.y == p.y)
 
+#a line is made up of two points, starting and end point
 class Line():
 	def __init__(self, p1, p2):
 		self.p1 = p1
@@ -33,12 +36,10 @@ class Line():
 		return (self.p2.x - self.p1.x)
 	def diffY(self):
 		return (self.p2.y - self.p1.y)
+	def diffPoints(self):
+		return Vector(self.diffX(), self.diffY())
 	def lineToPoints(self):
-		dx = self.diffX()
-		dy = self.diffY()
-		i,j = sign(dx),sign(dy)
-		p = Point(self.p1.x, self.p1.y)
-		points = [p]
+		dx, dy = self.diffX(), self.diffY()
 		if dx == 0 and dy == 0:
 			return [self.p1]
 		elif dy == 0:
@@ -47,7 +48,6 @@ class Line():
 			return self.lineToPointsVertical()
 		else:
 			if math.fabs(dx) == math.fabs(dy):
-				#return self.lineToPointsDiagonal()
 				return self.lineToPointsPerfectDiagonal()
 			else:
 				return self.lineToPointsDiagonal()
@@ -84,7 +84,31 @@ class Line():
 			points.append(p)
 			if p.equals(self.p2): break
 		return points
+	def equals(self, l):
+		if self.p1.equals(l.p1):
+			if self.p2.equals(l.p2): return True
+		if self.p1.equals(l.p2):
+			if self.p2.equals(l.p1): return True
+		return False
 
+#creates a square from the two 
+class Square():
+	def __init__(self, p1, p2):
+		self.hs1 = Line(p1,p1)
+		self.hs2 = Line(p2,p2)
+		self.vs1 = Line(p1,p2)
+		self.vs2 = Line(p2,p1)
+
+
+#vector for position differences and moving and selections
+class Vector():
+	def __init__(self, x, y):
+		self.x = x
+		self.y = y
+	def length(self):
+		return math.sqrt(math.pow(x,2)+math.pow(y,2))
+
+#a visual bitmap drawing
 class Canvas():
 	def __init__(self, width, height):
 		self.width = width
@@ -96,10 +120,19 @@ class Canvas():
 			for y in range(self.height):
 				self.pixels[x,y] = colour
 	def drawPoint(self, p, colour=WHITE):
-		self.pixels[p.x,p.y] = colour
+		try:
+			self.pixels[p.x,p.y] = colour
+		except IndexError:
+			print(p.toString()+" out of range")
+	def drawLine(self, l, colour=WHITE):
+		try:
+			for p in l.points: self.pixels[p.x,p.y] = colour
+		except  IndexError:
+			print(p.toString()+"out of range")
+
 	def saveToFile(self, file):
 		self.image.save(file)
-
+#defines a colour
 class Colour():
 	def __init__(self, r,g,b,a=C_RANGE):
 		self.r = r%MOD_RANGE
@@ -109,6 +142,7 @@ class Colour():
 	def tuple(self):
 		return (self.r,self.g,self.b,self.a)
 
+#generates a line of points adding by a float
 def pointGeneratorFloat(start, xf, yf):
 	c = 0
 	if fabsCheck(xf,yf):
@@ -141,3 +175,8 @@ def pointGeneratorFloat(start, xf, yf):
 		gen = pointGeneratorAdd(start, Point(sign(xf), sign(yf)))
 		while True:
 			yield next(gen)
+			
+def pointGeneratorAdd(start,add):
+	while True:
+		yield start
+		start = start.addToPoint(add)
