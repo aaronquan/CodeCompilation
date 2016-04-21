@@ -1,6 +1,7 @@
 from PIL import Image
 import math
 import sys
+import random
 
 from geoMath import *
 from pointGenerators import *
@@ -17,7 +18,7 @@ class Point():
 		self.x = x
 		self.y = y
 	def toString(self):
-		return "("+str(self.x)+","+str(self.y)+")"
+		return "Point("+str(self.x)+", "+str(self.y)+")"
 	def addPoint(self, p):
 		self.x = self.x+p.x
 		self.y = self.y+p.y
@@ -90,15 +91,19 @@ class Line():
 		if self.p1.equals(l.p2):
 			if self.p2.equals(l.p1): return True
 		return False
+	def toString(self):
+		return "Line("+self.p1.toString()+", "+self.p2.toString()+")"
 
-#creates a square from the two 
+#creates a square from two diagonal points 
 class Square():
 	def __init__(self, p1, p2):
-		self.hs1 = Line(p1,p1)
-		self.hs2 = Line(p2,p2)
-		self.vs1 = Line(p1,p2)
-		self.vs2 = Line(p2,p1)
-
+		self.p1, self.p2 = p1, p2
+		self.points = [Point(p1.x,p1.y), Point(p1.x,p2.y), 
+		               Point(p2.x,p2.y), Point(p2.x,p1.y)]
+		self.lines = [Line(self.points[0],self.points[1]),
+					  Line(self.points[1],self.points[2]),
+					  Line(self.points[2],self.points[3]),
+					  Line(self.points[3],self.points[0])]
 
 #vector for position differences and moving and selections
 class Vector():
@@ -106,7 +111,7 @@ class Vector():
 		self.x = x
 		self.y = y
 	def length(self):
-		return math.sqrt(math.pow(x,2)+math.pow(y,2))
+		return math.sqrt(math.pow(self.x,2)+math.pow(self.y,2))
 
 #a visual bitmap drawing
 class Canvas():
@@ -141,6 +146,16 @@ class Colour():
 		self.a = a
 	def tuple(self):
 		return (self.r,self.g,self.b,self.a)
+
+class smoothColour():
+	def __init__(self, r,g,b,a=C_RANGE):
+		self.r = smoother(r)
+		self.g = smoother(g)
+		self.b = smoother(b)
+		self.a = a
+	def tuple(self):
+		return (self.r,self.g,self.b,self.a)
+
 
 #generates a line of points adding by a float
 def pointGeneratorFloat(start, xf, yf):
@@ -180,3 +195,13 @@ def pointGeneratorAdd(start,add):
 	while True:
 		yield start
 		start = start.addToPoint(add)
+
+def randomPoint(x,y):
+	while True:
+		yield Point(random.randint(x, y),random.randint(x, y))
+
+def smoother(num):
+	num = num%(C_RANGE*2)
+	if num >= C_RANGE:
+		num = C_RANGE*2-num
+	return num
