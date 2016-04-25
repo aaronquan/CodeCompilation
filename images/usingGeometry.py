@@ -44,23 +44,15 @@ def main():
 		c.drawPoint(point, blue)
 	'''
 
-	sq1 = [Point(100,80), Point(100,220), Point(240,220), Point(240,80)]
-	lines = []
-	x = 0
-	while x < len(sq1)-1:
-		l = lines.append(Line(sq1[x], sq1[x+1]))
-		x += 1
-	lines.append(Line(sq1[len(sq1)-1], sq1[0]))
-	for l in lines:
-		print(l.toString())
-		for pt in l.points:
-			c.drawPoint(pt, red)
+	sq1 = Rectangle(Point(100,220), Point(240,80))
+	sq1.draw(c,blue)
+	sq1.fill(c,blue)
+	sq1.draw(c,green)
 
-	sq2 = Square(Point(100,80+200),Point(240,220+200))
-	for l in sq2.lines:
-		print(l.toString())
-		for pt in l.points:
-			c.drawPoint(pt, green)
+	sq2 = Rectangle(Point(100+300,80+80),Point(240+300,220))
+	sq2.draw(c, blue)
+	sq2pts = sq2.pointsOfArea()
+	sq2.fill(c, green)
 
 	c.saveToFile("geometry.png")
 main()

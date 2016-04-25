@@ -24,6 +24,11 @@ class Point():
 		self.y = self.y+p.y
 	def addToPoint(self, p):
 		return Point(self.x+p.x, self.y+p.y)
+	def draw(self, canvas, colour=WHITE):
+		try:
+			canvas.pixels[self.x,self.y] = colour
+		except IndexError:
+			print(p.toString()+" out of range")
 	def equals(self, p):
 		return (self.x == p.x and self.y == p.y)
 
@@ -37,6 +42,9 @@ class Line():
 		return (self.p2.x - self.p1.x)
 	def diffY(self):
 		return (self.p2.y - self.p1.y)
+	def draw(self, canvas, colour):
+		for p in self.points:
+			p.draw(canvas, colour)
 	def diffPoints(self):
 		return Vector(self.diffX(), self.diffY())
 	def lineToPoints(self):
@@ -94,24 +102,49 @@ class Line():
 	def toString(self):
 		return "Line("+self.p1.toString()+", "+self.p2.toString()+")"
 
+
 #creates a square from two diagonal points 
-class Square():
+class Rectangle():
 	def __init__(self, p1, p2):
 		self.p1, self.p2 = p1, p2
-		self.points = [Point(p1.x,p1.y), Point(p1.x,p2.y), 
-		               Point(p2.x,p2.y), Point(p2.x,p1.y)]
-		self.lines = [Line(self.points[0],self.points[1]),
+		self.points = (Point(p1.x,p1.y), Point(p1.x,p2.y), 
+		               Point(p2.x,p2.y), Point(p2.x,p1.y))
+		self.lines = (Line(self.points[0],self.points[1]),
 					  Line(self.points[1],self.points[2]),
 					  Line(self.points[2],self.points[3]),
-					  Line(self.points[3],self.points[0])]
+					  Line(self.points[3],self.points[0]))
+	def draw(self, canvas, colour):
+		for line in self.lines:
+			line.draw(canvas, colour)
+	def fill(self, canvas, colour):
+		for p in self.pointsOfArea():
+			p.draw(canvas, colour)
+	def isSquare(self):
+		return (math.fabs(self.p1.x - self.p2.x) == math.fabs(self.p1.y - self.p2.y))
+	def pointsOfArea(self):
+		points = []
+		dx = self.p2.x - self.p1.x
+		dy = self.p2.y - self.p1.y
+		for x in range(0, int(math.fabs(dx))+1):
+			x = x*sign(dx)
+			for y in range(0, int(math.fabs(dy))+1):
+				y = y*sign(dy)
+				points.append(Point(self.p1.x+x,self.p1.y+y))
+		return points
+
+
+
+
 
 #vector for position differences and moving and selections
-class Vector():
-	def __init__(self, x, y):
-		self.x = x
-		self.y = y
+class Vector(Point):
 	def length(self):
 		return math.sqrt(math.pow(self.x,2)+math.pow(self.y,2))
+
+#a list of connected points
+class Path():
+	def __init__(self, points):
+		self.points = points
 
 #a visual bitmap drawing
 class Canvas():
@@ -134,9 +167,9 @@ class Canvas():
 			for p in l.points: self.pixels[p.x,p.y] = colour
 		except  IndexError:
 			print(p.toString()+"out of range")
-
 	def saveToFile(self, file):
 		self.image.save(file)
+
 #defines a colour
 class Colour():
 	def __init__(self, r,g,b,a=C_RANGE):
