@@ -43,16 +43,20 @@ def main():
 	for point in l3.points:
 		c.drawPoint(point, blue)
 	'''
+	'''
+	#sq1 = Rectangle(Point(100,220), Point(240,80))
+	#sq1.draw(c,blue)
+	#sq1.fill(c,blue)
+	#sq1.draw(c,green)
 
-	sq1 = Rectangle(Point(100,220), Point(240,80))
-	sq1.draw(c,blue)
-	sq1.fill(c,blue)
-	sq1.draw(c,green)
-
-	sq2 = Rectangle(Point(100+300,80+80),Point(240+300,220))
+	sq2 = Rectangle(Point(-200,40),Point(50,10))
 	sq2.draw(c, blue)
 	sq2pts = sq2.pointsOfArea()
-	sq2.fill(c, green)
+	sq2.fill(c, red)
+	'''
 
+	q,w,e = Point(20,30), Point(120,20), Point(80,160)
+	path = Path([q,w,e])
+	path.draw(c, red)
 	c.saveToFile("geometry.png")
 main()

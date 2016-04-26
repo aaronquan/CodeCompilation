@@ -28,7 +28,7 @@ class Point():
 		try:
 			canvas.pixels[self.x,self.y] = colour
 		except IndexError:
-			print(p.toString()+" out of range")
+			print(self.toString()+" out of range")
 	def equals(self, p):
 		return (self.x == p.x and self.y == p.y)
 
@@ -121,6 +121,8 @@ class Rectangle():
 			p.draw(canvas, colour)
 	def isSquare(self):
 		return (math.fabs(self.p1.x - self.p2.x) == math.fabs(self.p1.y - self.p2.y))
+	def area(self):
+		return int((math.fabs(self.p1.x-self.p2.x)+1)*(math.fabs(self.p1.y-self.p2.y)+1))
 	def pointsOfArea(self):
 		points = []
 		dx = self.p2.x - self.p1.x
@@ -133,9 +135,6 @@ class Rectangle():
 		return points
 
 
-
-
-
 #vector for position differences and moving and selections
 class Vector(Point):
 	def length(self):
@@ -145,6 +144,21 @@ class Vector(Point):
 class Path():
 	def __init__(self, points):
 		self.points = points
+		self.lines = self.makeLines()
+	def makeLines(self):
+		p = self.points
+		if len(p) == 0 | 1:
+			return []
+		elif len(p) == 2:
+			return [Line(p[0],p[1])]
+		else:
+			lines = []
+			for i in range(0, len(p)-1):
+				lines.append(Line(p[i],p[i+1]))
+			return lines
+	def draw(self, canvas, colour):
+		for line in self.lines:
+			line.draw(canvas, colour)
 
 #a visual bitmap drawing
 class Canvas():
