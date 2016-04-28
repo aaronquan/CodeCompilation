@@ -260,6 +260,46 @@ def smoother(num):
 		num = C_RANGE*2-num
 	return num
 
+def bfs(point, canvas):
+	p = canvas.pixels
+	colour = p[point.x, point.y]
+	allPoints = []
+	done = []
+	q = [('a',point)]
+	directions = [('r',Point(1,0)),('u',Point(0,1)),('l',Point(-1,0)),('d',Point(0,-1))]
+
+	x = 0
+	while len(q) != 0:
+		#print(x)
+		curr = q.pop()
+		x += 1
+		print(curr[1].toString())
+		for d in directions:
+			passIt = False
+			if d[0] == curr[0]: continue
+			n = curr[1].addToPoint(d[1])
+			for s in done:
+				if s.equals(n):
+					passIt = True
+					break
+			if passIt: 
+				done.append(n)
+				continue
+			try:
+				if p[n.x,n.y] == colour: 
+					q.append((d[0], n))
+				done.append(n)
+			except IndexError:
+				pass
+		#if x == 5:
+			#break
+		allPoints.append(curr[1])
+		done.append(curr[1])
+	return allPoints
+
+
+
+
 
 #gets all pixels around with the same colour
 def fillPoints(point, canvas):

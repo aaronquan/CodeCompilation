@@ -2,7 +2,7 @@ from geometry import *
 import itertools
 
 def main():
-	x,y = 100,100
+	x,y = 200,200
 	c = Canvas(x,y)
 	black = Colour(0,0,0).tuple()
 	white = Colour(255,255,255).tuple()
@@ -49,16 +49,23 @@ def main():
 	#sq1.fill(c,blue)
 	#sq1.draw(c,green)
 	'''
+	'''
 	sq2 = Rectangle(Point(70,40),Point(20,90))
 	sq2.draw(c, blue)
 	sq2pts = sq2.pointsOfArea()
 	sq2.fill(c, green)
-	fillPoints(Point(50,50), c)
+	pts = bfs(Point(50,50), c)
+	print (len(pts))
+	for p in pts:
+		p.draw(c,red)
 	'''
 	q,w,e = Point(20,30), Point(120,20), Point(80,160)
 	path = Path([q,w,e,q])
 	path.draw(c, red)
-	fillPoints(q, c)
-	'''
+	pts = bfs(Point(25,33), c)
+	print (len(pts))
+	for p in pts:
+		p.draw(c,green)
+	
 	c.saveToFile("geometry.png")
 main()
