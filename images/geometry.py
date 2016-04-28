@@ -159,6 +159,13 @@ class Path():
 	def draw(self, canvas, colour):
 		for line in self.lines:
 			line.draw(canvas, colour)
+	def fill(self):
+		p = self.points
+	#def pointsOfArea(self):
+
+	def isClosed(self):
+		p = self.points
+		return (p[0].equals(p[len(p-1)]))
 
 #a visual bitmap drawing
 class Canvas():
@@ -252,3 +259,27 @@ def smoother(num):
 	if num >= C_RANGE:
 		num = C_RANGE*2-num
 	return num
+
+
+#gets all pixels around with the same colour
+def fillPoints(point, canvas):
+	p = canvas.pixels
+	colour = p[point.x, point.y]
+	v = Point(0,0)
+	x = 0
+	while x < 100:
+		l = point.addToPoint(v)
+		if p[l.x,l.y] == colour:
+			print(p[x,y])
+			print(l.toString())
+		else: break
+		x += 1
+
+
+
+
+	'''
+	for x in range(0, canvas.width):
+		for y in range(0, canvas.height):
+			if p[x,y] == colour: print(p[x,y])
+	'''
