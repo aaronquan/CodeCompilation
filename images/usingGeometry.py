@@ -59,13 +59,26 @@ def main():
 	for p in pts:
 		p.draw(c,red)
 	'''
-	q,w,e = Point(20,30), Point(120,20), Point(80,160)
+	'''
+	q,w,e = Point(20,30), Point(60,20), Point(60,60)
 	path = Path([q,w,e,q])
 	path.draw(c, red)
 	pts = bfs(Point(25,33), c)
 	print (len(pts))
 	for p in pts:
 		p.draw(c,green)
+	'''
+	e = Point(99,99)
+
+	
+	for x in range(0,20):
+		cir = circleGenerator(e, 5*x+1)
+		print(x)
+		for point in cir:
+			point.draw(c, red)
+		c.fillAt(e.addToPoint(Point(0,5*x)))
+	
+
 	
 	c.saveToFile("geometry.png")
 main()

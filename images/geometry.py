@@ -56,7 +56,7 @@ class Line():
 		elif dx == 0:
 			return self.lineToPointsVertical()
 		else:
-			if math.fabs(dx) == math.fabs(dy):
+			if abs(dx) == abs(dy):
 				return self.lineToPointsPerfectDiagonal()
 			else:
 				return self.lineToPointsDiagonal()
@@ -120,19 +120,28 @@ class Rectangle():
 		for p in self.pointsOfArea():
 			p.draw(canvas, colour)
 	def isSquare(self):
-		return (math.fabs(self.p1.x - self.p2.x) == math.fabs(self.p1.y - self.p2.y))
+		return (abs(self.p1.x - self.p2.x) == abs(self.p1.y - self.p2.y))
 	def area(self):
-		return int((math.fabs(self.p1.x-self.p2.x)+1)*(math.fabs(self.p1.y-self.p2.y)+1))
+		return int((abs(self.p1.x-self.p2.x)+1)*(abs(self.p1.y-self.p2.y)+1))
 	def pointsOfArea(self):
 		points = []
 		dx = self.p2.x - self.p1.x
 		dy = self.p2.y - self.p1.y
-		for x in range(0, int(math.fabs(dx))+1):
+		for x in range(0, int(abs(dx))+1):
 			x = x*sign(dx)
-			for y in range(0, int(math.fabs(dy))+1):
+			for y in range(0, int(abs(dy))+1):
 				y = y*sign(dy)
 				points.append(Point(self.p1.x+x,self.p1.y+y))
 		return points
+
+class Circle():
+	def __init__(self, centre, radius):
+		self.centre = centre
+		self.radius = radius
+	def circleToPoints(self):
+		pass
+		#x*x + y*y = 
+		c = self.centre
 
 
 #vector for position differences and moving and selections
@@ -190,6 +199,11 @@ class Canvas():
 			print(p.toString()+"out of range")
 	def saveToFile(self, file):
 		self.image.save(file)
+	def fillAt(self, point, colour=WHITE):
+		points = bfs(point, self)
+		for p in points:
+			self.drawPoint(p, colour)
+
 
 #defines a colour
 class Colour():
@@ -215,7 +229,7 @@ class smoothColour():
 def pointGeneratorFloat(start, xf, yf):
 	c = 0
 	if fabsCheck(xf,yf):
-		grad = math.fabs(yf/xf)
+		grad = abs(yf/xf)
 		while True:
 			yield start
 			c += grad*sign(yf)
@@ -228,7 +242,7 @@ def pointGeneratorFloat(start, xf, yf):
 			else:
 				start = start.addToPoint(Point(sign(xf),0))
 	elif fabsCheck(yf,xf):
-		grad = math.fabs(xf/yf)
+		grad = abs(xf/yf)
 		while True:
 			yield start
 			c += grad*sign(xf)
@@ -270,13 +284,12 @@ def bfs(point, canvas):
 
 	x = 0
 	while len(q) != 0:
-		#print(x)
 		curr = q.pop()
 		x += 1
-		print(curr[1].toString())
+		#print(curr[1].toString())
 		for d in directions:
 			passIt = False
-			if d[0] == curr[0]: continue
+			#if d[0] == curr[0]: continue
 			n = curr[1].addToPoint(d[1])
 			for s in done:
 				if s.equals(n):
@@ -297,7 +310,25 @@ def bfs(point, canvas):
 		done.append(curr[1])
 	return allPoints
 
-
+def circleGenerator(centre, radius):
+	rSqu = radius*radius
+	cx,cy = centre.x, centre.y
+	lastY = radius
+	for x in range(0, radius+1):
+		y = math.sqrt(abs(rSqu - x*x))
+		ny = round(y)
+		dy = (lastY - ny)
+		if abs(dy) > 1:
+			for gy in range(0, abs(dy)):
+				yield (Point(x+cx, ny+cy+sign(dy)*gy))
+				yield (Point(x+cx, -ny+cy-sign(dy)*gy))
+				yield (Point(-x+cx, ny+cy+sign(dy)*gy))
+				yield (Point(-x+cx, -ny+cy-sign(dy)*gy))
+		lastY = ny
+		yield (Point(x+cx, ny+cy))
+		yield (Point(x+cx, -ny+cy))
+		yield (Point(-x+cx, ny+cy))
+		yield (Point(-x+cx, -ny+cy))
 
 
 

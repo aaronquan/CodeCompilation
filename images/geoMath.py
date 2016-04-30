@@ -16,3 +16,5 @@ def sign(var):
 
 def fabsCheck(p,q):
 	return(math.fabs(p) > math.fabs(q))
+
+
