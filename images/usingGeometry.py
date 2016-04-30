@@ -2,14 +2,14 @@ from geometry import *
 import itertools
 
 def main():
-	x,y = 200,200
+	x,y = 400,400
 	c = Canvas(x,y)
 	black = Colour(0,0,0).tuple()
 	white = Colour(255,255,255).tuple()
 	green = Colour(0,255,0).tuple()
 	red = Colour(255,0,0).tuple()
 	blue = Colour(0,0,255).tuple()
-	c.background(black)
+	#c.background(black)
 
 	'''
 	p_array = []
@@ -68,16 +68,12 @@ def main():
 	for p in pts:
 		p.draw(c,green)
 	'''
-	e = Point(99,99)
+	e = Point(int(x/2-1),int(y/2-1))
 
+	cir = circleGenerator(e, 150)
 	
-	for x in range(0,20):
-		cir = circleGenerator(e, 5*x+1)
-		print(x)
-		for point in cir:
-			point.draw(c, red)
-		c.fillAt(e.addToPoint(Point(0,5*x)))
-	
+	#c.fillAt(Point(0,0))
+	c.fillAt(e, blue)
 
 	
 	c.saveToFile("geometry.png")

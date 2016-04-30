@@ -19,6 +19,8 @@ class Point():
 		self.y = y
 	def toString(self):
 		return "Point("+str(self.x)+", "+str(self.y)+")"
+	def shortString(self):
+		return str(self.x)+", "+str(self.y)
 	def addPoint(self, p):
 		self.x = self.x+p.x
 		self.y = self.y+p.y
@@ -138,10 +140,12 @@ class Circle():
 	def __init__(self, centre, radius):
 		self.centre = centre
 		self.radius = radius
+		self.points = circleToPoints()
 	def circleToPoints(self):
-		pass
-		#x*x + y*y = 
-		c = self.centre
+		pts = []
+		for p in circleGenerator:
+			pts.append(p)
+		return pts
 
 
 #vector for position differences and moving and selections
@@ -200,7 +204,7 @@ class Canvas():
 	def saveToFile(self, file):
 		self.image.save(file)
 	def fillAt(self, point, colour=WHITE):
-		points = bfs(point, self)
+		points = fillPoints(point, self)
 		for p in points:
 			self.drawPoint(p, colour)
 
@@ -274,42 +278,6 @@ def smoother(num):
 		num = C_RANGE*2-num
 	return num
 
-def bfs(point, canvas):
-	p = canvas.pixels
-	colour = p[point.x, point.y]
-	allPoints = []
-	done = []
-	q = [('a',point)]
-	directions = [('r',Point(1,0)),('u',Point(0,1)),('l',Point(-1,0)),('d',Point(0,-1))]
-
-	x = 0
-	while len(q) != 0:
-		curr = q.pop()
-		x += 1
-		#print(curr[1].toString())
-		for d in directions:
-			passIt = False
-			#if d[0] == curr[0]: continue
-			n = curr[1].addToPoint(d[1])
-			for s in done:
-				if s.equals(n):
-					passIt = True
-					break
-			if passIt: 
-				done.append(n)
-				continue
-			try:
-				if p[n.x,n.y] == colour: 
-					q.append((d[0], n))
-				done.append(n)
-			except IndexError:
-				pass
-		#if x == 5:
-			#break
-		allPoints.append(curr[1])
-		done.append(curr[1])
-	return allPoints
-
 def circleGenerator(centre, radius):
 	rSqu = radius*radius
 	cx,cy = centre.x, centre.y
@@ -330,27 +298,62 @@ def circleGenerator(centre, radius):
 		yield (Point(-x+cx, ny+cy))
 		yield (Point(-x+cx, -ny+cy))
 
-
+def bfs(point, canvas):
+	p = canvas.pixels
+	colour = p[point.x, point.y]
+	allPoints = []
+	done = []
+	q = [(point, 'ruld')]
+	directions = {'r':(Point(1,0), 'rud'),
+	              'u':(Point(0,1), 'ulr'),
+	              'l':(Point(-1,0), 'uld'),
+	              'd':(Point(0,-1), 'rld')}
+	x = 0
+	while len(q) != 0:
+		curr = q.pop()
+		x += 1
+		for d in curr[1]:
+			passIt = False
+			n = curr[0].addToPoint(directions[d][0])
+			for s in done:
+				if s.equals(n):
+					passIt = True
+					break
+			if passIt: 
+				continue
+			try:
+				if p[n.x,n.y] == colour: 
+					q.append((n, directions[d][1]))
+				done.append(n)
+			except IndexError:
+				done.append(n)
+		allPoints.append(curr[0])
+		done.append(curr[0])
+	return allPoints
 
 #gets all pixels around with the same colour
 def fillPoints(point, canvas):
 	p = canvas.pixels
 	colour = p[point.x, point.y]
-	v = Point(0,0)
-	x = 0
-	while x < 100:
-		l = point.addToPoint(v)
-		if p[l.x,l.y] == colour:
-			print(p[x,y])
-			print(l.toString())
-		else: break
-		x += 1
-
-
-
-
-	'''
-	for x in range(0, canvas.width):
-		for y in range(0, canvas.height):
-			if p[x,y] == colour: print(p[x,y])
-	'''
+	allPoints = []
+	done = {}
+	q = [(point, 'ruld')]
+	directions = {'r':(Point(1,0), 'rud'),
+	              'u':(Point(0,1), 'ulr'),
+	              'l':(Point(-1,0), 'uld'),
+	              'd':(Point(0,-1), 'rld')}
+	while len(q) != 0:
+		curr = q.pop()
+		for d in curr[1]:
+			n = curr[0].addToPoint(directions[d][0])
+			if n.shortString() in done:
+				continue
+			try:
+				if p[n.x,n.y] == colour: 
+					q.append((n, directions[d][1]))
+				done[n.shortString()] = True
+			except IndexError:
+				done[n.shortString()] = True
+		allPoints.append(curr[0])
+		done[n.shortString()] = True
+	return allPoints
