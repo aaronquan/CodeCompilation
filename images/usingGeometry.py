@@ -68,12 +68,13 @@ def main():
 	for p in pts:
 		p.draw(c,green)
 	'''
-	rad = 4
+	rad = 20
 	e = Point(int(x/2-1),int(y/2-1))
-	f = Point(int(x/2-1),int(y/2-1)+11)
+	f = Point(int(x/2-1),int(y/2-1)+(rad+1)*2)
 	cir = Circle(e, rad)
 	cir2 = Circle(f, rad)
 	cir.draw(c, blue)
+	#c.fillAt(e, green)
 	for p in cir2.pointsOfAreaOneMore():
 		p.draw(c,red)
 	#for p in cir2.pointsOfArea():

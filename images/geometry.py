@@ -302,26 +302,41 @@ def smoother(num):
 		num = C_RANGE*2-num
 	return num
 
+def circleGenerator(centre, radius):
+	rSqu = radius*radius
+	cx,cy = centre.x, centre.y
+	lastY, lastX = radius, radius
+	x,y, dx, dy = 0, 0, 0, 0
+	while dy < 1:
+		ny = math.sqrt(abs(rSqu - x*x))
+		sy = round(ny)
+		dy = lastY - ny
+		lastY = ny
+		yield (Point(x+cx, sy+cy))
+		yield (Point(x+cx, -sy+cy))
+		yield (Point(-x+cx, sy+cy))
+		yield (Point(-x+cx, -sy+cy))
+		x += 1
+
+	while dx < 1:
+		nx = math.sqrt(abs(rSqu - y*y))
+		sx = round(nx)
+		dx = lastX - nx
+		lastX = nx
+		yield (Point(sx+cx, y+cy))
+		yield (Point(sx+cx, -y+cy))
+		yield (Point(-sx+cx, y+cy))
+		yield (Point(-sx+cx, -y+cy))
+		y += 1
+
 def circleGeneratorOther(centre, radius):
 	rSqu = radius*radius
 	cx,cy = centre.x, centre.y
 	lastY, lastX = radius, radius
 	for x in range(0, radius+1):
-		y = math.sqrt(abs(rSqu - x*x))
-		ny = round(y)
-		dy = lastY - y
-		lastY = y
-		yield (Point(x+cx, ny+cy))
-		yield (Point(x+cx, -ny+cy))
-		yield (Point(-x+cx, ny+cy))
-		yield (Point(-x+cx, -ny+cy))
+		y = math.sqrt(abs(x*x - rSqu))
+		#ny = math.ceil(y)
 
-def circleGenerator(centre, radius):
-	rSqu = radius*radius
-	cx,cy = centre.x, centre.y
-	lastY, lastX = radius, radius
-	for x in range(0, radius+1):
-		y = math.sqrt(abs(rSqu - x*x))
 		ny = round(y)
 		dy = round(lastY - ny)
 		print(str(x)+': ')
@@ -334,7 +349,7 @@ def circleGenerator(centre, radius):
 				yield (Point(x+cx, -ny+cy-sign(dy)*gy))
 				yield (Point(-x+cx, ny+cy+sign(dy)*gy))
 				yield (Point(-x+cx, -ny+cy-sign(dy)*gy))
-		lastY = y
+		lastY = ny
 		yield (Point(x+cx, ny+cy))
 		yield (Point(x+cx, -ny+cy))
 		yield (Point(-x+cx, ny+cy))
