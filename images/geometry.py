@@ -20,7 +20,7 @@ class Point():
 	def toString(self):
 		return "Point("+str(self.x)+", "+str(self.y)+")"
 	def shortString(self):
-		return str(self.x)+", "+str(self.y)
+		return str(self.x)+","+str(self.y)
 	def addPoint(self, p):
 		self.x = self.x+p.x
 		self.y = self.y+p.y
@@ -307,54 +307,35 @@ def circleGenerator(centre, radius):
 	cx,cy = centre.x, centre.y
 	lastY, lastX = radius, radius
 	x,y, dx, dy = 0, 0, 0, 0
+	pDict = {}
 	while dy < 1:
 		ny = math.sqrt(abs(rSqu - x*x))
 		sy = round(ny)
 		dy = lastY - ny
 		lastY = ny
-		yield (Point(x+cx, sy+cy))
-		yield (Point(x+cx, -sy+cy))
-		yield (Point(-x+cx, sy+cy))
-		yield (Point(-x+cx, -sy+cy))
+		pts = (Point(x+cx, sy+cy),Point(x+cx, -sy+cy),
+			   Point(-x+cx, -sy+cy),Point(-x+cx, sy+cy))
+		for p in pts:
+			pStr = p.shortString()
+			if pStr not in pDict:
+				pDict[pStr] = True
+				yield p
 		x += 1
-
+		'''
 	while dx < 1:
 		nx = math.sqrt(abs(rSqu - y*y))
 		sx = round(nx)
 		dx = lastX - nx
 		lastX = nx
-		yield (Point(sx+cx, y+cy))
-		yield (Point(sx+cx, -y+cy))
-		yield (Point(-sx+cx, y+cy))
-		yield (Point(-sx+cx, -y+cy))
+		pts = (Point(sx+cx, y+cy),Point(-sx+cx, y+cy),
+			   Point(sx+cx, -y+cy),Point(-sx+cx, -y+cy))
+		for p in pts:
+			pStr = p.shortString()
+			if pStr not in pDict:
+				pDict[pStr] = True
+				yield p
 		y += 1
-
-def circleGeneratorOther(centre, radius):
-	rSqu = radius*radius
-	cx,cy = centre.x, centre.y
-	lastY, lastX = radius, radius
-	for x in range(0, radius+1):
-		y = math.sqrt(abs(x*x - rSqu))
-		#ny = math.ceil(y)
-
-		ny = round(y)
-		dy = round(lastY - ny)
-		print(str(x)+': ')
-		print(y)
-		print(str(dy))
-		if abs(dy) > 1:
-			#print(str(x)+':'+str(dy))
-			for gy in range(0,abs(dy)):
-				yield (Point(x+cx, ny+cy+sign(dy)*gy))
-				yield (Point(x+cx, -ny+cy-sign(dy)*gy))
-				yield (Point(-x+cx, ny+cy+sign(dy)*gy))
-				yield (Point(-x+cx, -ny+cy-sign(dy)*gy))
-		lastY = ny
-		yield (Point(x+cx, ny+cy))
-		yield (Point(x+cx, -ny+cy))
-		yield (Point(-x+cx, ny+cy))
-		yield (Point(-x+cx, -ny+cy))
-
+		'''
 def bfs(point, canvas):
 	p = canvas.pixels
 	colour = p[point.x, point.y]
