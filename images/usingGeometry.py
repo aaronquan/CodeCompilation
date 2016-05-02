@@ -69,12 +69,12 @@ def main():
 		p.draw(c,green)
 	'''
 	e = Point(int(x/2-1),int(y/2-1))
-
-	cir = circleGenerator(e, 150)
-	
-	#c.fillAt(Point(0,0))
-	c.fillAt(e, blue)
-
-	
+	cir = Circle(e, 20)
+	cir.draw(c, green)
+	print(len(cir.pointsOfArea()))
+	print(len(fillPoints(e, c)))
+	print(len(fillPoints(e, c)) == len(cir.pointsOfArea()))
+	for p in cir.pointsOfArea():
+		p.draw(c, red)
 	c.saveToFile("geometry.png")
 main()

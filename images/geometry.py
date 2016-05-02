@@ -140,12 +140,26 @@ class Circle():
 	def __init__(self, centre, radius):
 		self.centre = centre
 		self.radius = radius
-		self.points = circleToPoints()
+		self.points = self.circleToPoints()
+	def draw(self, canvas, colour=WHITE):
+		for p in self.circleToPoints():
+			canvas.pixels[p.x, p.y] = colour
+	def pointsOfArea(self):
+		pts = []
+		c = self.centre
+		d = self.radius*2
+		for x in range(-d, d):
+			for y in range(-d, d):
+				if round(self.radius) >= round(math.sqrt(x*x + y*y)):
+					pts.append(Point(x+c.x, y+c.y))
+		return pts
 	def circleToPoints(self):
 		pts = []
-		for p in circleGenerator:
+		for p in circleGenerator(self.centre, self.radius):
 			pts.append(p)
 		return pts
+	def area(self):
+		return math.pi*self.radius*self.radius
 
 
 #vector for position differences and moving and selections
