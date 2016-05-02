@@ -68,13 +68,21 @@ def main():
 	for p in pts:
 		p.draw(c,green)
 	'''
+	rad = 4
 	e = Point(int(x/2-1),int(y/2-1))
-	cir = Circle(e, 20)
-	cir.draw(c, green)
-	print(len(cir.pointsOfArea()))
-	print(len(fillPoints(e, c)))
-	print(len(fillPoints(e, c)) == len(cir.pointsOfArea()))
-	for p in cir.pointsOfArea():
-		p.draw(c, red)
+	f = Point(int(x/2-1),int(y/2-1)+11)
+	cir = Circle(e, rad)
+	cir2 = Circle(f, rad)
+	cir.draw(c, blue)
+	for p in cir2.pointsOfAreaOneMore():
+		p.draw(c,red)
+	#for p in cir2.pointsOfArea():
+	#	p.draw(c,green)
+	#print(len(cir.pointsOfArea()))
+	#print(len(fillPoints(e, c)))
+	#print(len(fillPoints(e, c)) == len(cir.pointsOfArea()))
+	#for p in cir.pointsOfArea():
+	#	p.draw(c, red)
+	print(widthHeightOfPoints(c, cir.points))
 	c.saveToFile("geometry.png")
 main()

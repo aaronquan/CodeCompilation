@@ -142,7 +142,7 @@ class Circle():
 		self.radius = radius
 		self.points = self.circleToPoints()
 	def draw(self, canvas, colour=WHITE):
-		for p in self.circleToPoints():
+		for p in self.points:
 			canvas.pixels[p.x, p.y] = colour
 	def pointsOfArea(self):
 		pts = []
@@ -150,7 +150,17 @@ class Circle():
 		d = self.radius*2
 		for x in range(-d, d):
 			for y in range(-d, d):
-				if round(self.radius) >= round(math.sqrt(x*x + y*y)):
+				if self.radius > round(math.sqrt(x*x + y*y)):
+					pts.append(Point(x+c.x, y+c.y))
+		return pts
+	def pointsOfAreaOneMore(self):
+		pts = []
+		c = self.centre
+		newR = self.radius+1
+		d = newR*2
+		for x in range(-d, d):
+			for y in range(-d, d):
+				if newR > round(math.sqrt(x*x + y*y)):
 					pts.append(Point(x+c.x, y+c.y))
 		return pts
 	def circleToPoints(self):
@@ -292,21 +302,39 @@ def smoother(num):
 		num = C_RANGE*2-num
 	return num
 
-def circleGenerator(centre, radius):
+def circleGeneratorOther(centre, radius):
 	rSqu = radius*radius
 	cx,cy = centre.x, centre.y
-	lastY = radius
+	lastY, lastX = radius, radius
 	for x in range(0, radius+1):
 		y = math.sqrt(abs(rSqu - x*x))
 		ny = round(y)
-		dy = (lastY - ny)
+		dy = lastY - y
+		lastY = y
+		yield (Point(x+cx, ny+cy))
+		yield (Point(x+cx, -ny+cy))
+		yield (Point(-x+cx, ny+cy))
+		yield (Point(-x+cx, -ny+cy))
+
+def circleGenerator(centre, radius):
+	rSqu = radius*radius
+	cx,cy = centre.x, centre.y
+	lastY, lastX = radius, radius
+	for x in range(0, radius+1):
+		y = math.sqrt(abs(rSqu - x*x))
+		ny = round(y)
+		dy = round(lastY - ny)
+		print(str(x)+': ')
+		print(y)
+		print(str(dy))
 		if abs(dy) > 1:
-			for gy in range(0, abs(dy)):
+			#print(str(x)+':'+str(dy))
+			for gy in range(0,abs(dy)):
 				yield (Point(x+cx, ny+cy+sign(dy)*gy))
 				yield (Point(x+cx, -ny+cy-sign(dy)*gy))
 				yield (Point(-x+cx, ny+cy+sign(dy)*gy))
 				yield (Point(-x+cx, -ny+cy-sign(dy)*gy))
-		lastY = ny
+		lastY = y
 		yield (Point(x+cx, ny+cy))
 		yield (Point(x+cx, -ny+cy))
 		yield (Point(-x+cx, ny+cy))
@@ -371,3 +399,26 @@ def fillPoints(point, canvas):
 		allPoints.append(curr[0])
 		done[n.shortString()] = True
 	return allPoints
+
+def outline():
+	pass
+
+
+# may use a specified minimum or maximum
+def widthHeightOfPoints(canvas, points):
+	if len(points) <= 1:
+		return {'width':0,'height':0}
+	diff = max(canvas.width, canvas.height)
+	minH, maxH, minW, maxW = diff, -diff, diff, -diff
+	for p in points:
+		if p.x > maxW:
+			maxW = p.x
+		if p.y > maxH:
+			maxH = p.y
+		if p.x < minW:
+			minW = p.x
+		if p.y < minH:
+			minH = p.y
+	return {'width':maxW - minW, 'height': maxH - minH}
+
+
