@@ -16,8 +16,17 @@ class App():
 
 	def menuBar(self):
 		menubar = Menu(self.tk)
-		menubar.add_command(label="Hello!", command=hello())
-		menubar.add_command(label="Quit!", command=self.tk.quit)
+		filemenu = Menu(menubar, tearoff=0)
+		filemenu.add_command(label="New", command=self.canvas)
+		filemenu.add_command(label="Open", command=hello)
+		filemenu.add_command(label="Save", command=hello)
+		filemenu.add_separator()
+		filemenu.add_command(label="Exit", command=self.tk.quit)
+		menubar.add_cascade(label="File", menu=filemenu)
 		self.tk.config(menu=menubar)
+	def canvas(self):
+		canvas = Canvas(self.tk, bg='#333399')
+		canvas.create_bitmap(100,100)
+		canvas.pack()
 
 main()
